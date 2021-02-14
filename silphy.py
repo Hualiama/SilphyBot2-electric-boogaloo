@@ -113,7 +113,7 @@ silphy_bot = SilphyBot(intents=intents)
 @silphy_bot.event
 async def on_ready():
 	slog.log("Ready!")
-	slog.log("Logged in as {0}".format(silphy_bot.user.display_name))
+	slog.log(f"Logged in as {silphy_bot.user.display_name}")
 
 
 @silphy_bot.event
