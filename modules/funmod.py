@@ -1,6 +1,7 @@
 from discord.ext import commands
 from utils import is_number
 from core import BaseCog
+import discord
 import random
 
 
@@ -17,3 +18,20 @@ class FunCommands(BaseCog):
 			target = random.choice(users)
 			
 			await ctx.reply(f"I choose: {target.mention}")
+	
+	@commands.command(name="say", brief="Sends a message in a channel", description="Sends [text] in [channel].")
+	async def message_channel(self, ctx: commands.Context, channel: discord.TextChannel, *, text):
+		perms: discord.Permissions = ctx.guild.get_member(ctx.me.id).permissions_in(channel)
+		
+		if not (perms.send_messages and perms.view_channel):
+			await ctx.reply("I can't send messages there x3")
+			return
+
+		await channel.send(text)
+		
+	@commands.command(name="whisper", brief="Sends a private message to a user", description="Sends [text] tp [user] in a direct message.")
+	async def dm_user(self, ctx: commands.Context, user: discord.Member, *, text):
+		try:
+			await user.send(text)
+		except discord.HTTPException:
+			await ctx.reply("I can't DM that user! They either blocked me, or have direct messages turned off!")
