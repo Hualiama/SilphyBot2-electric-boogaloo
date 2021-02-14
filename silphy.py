@@ -8,6 +8,8 @@
 
 from storage import Database
 from discord.ext import commands
+from modules.funmod import FunCommands
+
 import discord
 import logging
 import events
@@ -96,6 +98,9 @@ class SilphyBot(commands.Bot):
 	
 	def is_admin(self, user: discord.User):
 		return user.id in self.settings[SilphyBot.ADMIN_LIST_KEY]
+	
+	def load_cogs(self):
+		self.add_cog(FunCommands(self))
 
 
 # client setup
@@ -112,33 +117,36 @@ async def on_ready():
 
 
 @silphy_bot.event
-async def on_message(message: discord.Message):
-	if message.author.bot or message.guild is None:
+async def on_message(msg: discord.Message):
+	if msg.author.bot or msg.guild is None:
 		return
 	
-	if message.guild.id != silphy_bot.server_id:
+	if msg.guild.id != silphy_bot.server_id:
 		return
 	
-	if message.channel.id == silphy_bot.gate_channel_id:
+	if msg.channel.id == silphy_bot.gate_channel_id:
 		# Process gate message
-		await events.gate_check(silphy_bot, message)
+		await events.gate_check(silphy_bot, msg)
 		return
-	elif not silphy_bot.is_admin(message.author):
-		if message.channel.id != silphy_bot.staff_channel_id:
+	elif not silphy_bot.is_admin(msg.author):
+		if msg.channel.id != silphy_bot.staff_channel_id:
 			# If the message is not sent by an admin, and is in the wrong channel, ignore it for now.
 			# TODO: Profanity filter
 			return
+	
+	await silphy_bot.process_commands(message=msg)
 		
 	
 # Main program
 if __name__ == "__main__":
 	slog.log("Setting up logger...")
 	logging.basicConfig(level=logging.WARNING)
-	slog.log("Logger set up.")
 	
 	slog.log("Loading settings...")
 	silphy_bot.load_settings()
-	slog.log("Settings loaded.")
+	
+	slog.log("Loading cogs...")
+	silphy_bot.load_cogs()
 	
 	slog.log("Starting Client...")
 	silphy_bot.run(silphy_bot.settings[SilphyBot.TOKEN_KEY])
