@@ -3,12 +3,12 @@
 
 # TODO: Strike Member
 # TODO: Random Member
-# TODO: Send Message to Channel
-# TODO: Send Message to User
-
 from storage import Database
 from discord.ext import commands
+
+from modules.adminmod import AdminCommands
 from modules.funmod import FunCommands
+from modules.strikecommands import StrikeCommands
 
 import discord
 import logging
@@ -101,6 +101,8 @@ class SilphyBot(commands.Bot):
 	
 	def load_cogs(self):
 		self.add_cog(FunCommands(self))
+		self.add_cog(StrikeCommands(self))
+		self.add_cog(AdminCommands(self))
 
 
 # client setup

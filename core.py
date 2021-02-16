@@ -1,9 +1,9 @@
 from discord.ext import commands
-
+from silphy import SilphyBot
 import slog
 
 
 class BaseCog(commands.Cog):
-	def __init__(self, bot: commands.Bot):
+	def __init__(self, bot: SilphyBot):
 		self.bot = bot
 		slog.log(f"Loaded cog {self.qualified_name}")
