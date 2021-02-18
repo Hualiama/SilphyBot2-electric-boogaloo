@@ -7,6 +7,7 @@ import random
 
 class FunCommands(BaseCog):
 	@commands.command(name="raffle", brief="Selects a random member", description="Select a random member. If role is specified, selects only those with that role.")
+	@commands.has_permissions(manage_messages=True)
 	async def random_member(self, ctx: commands.Context, role: str = ""):
 		if role != "" and not is_number(role):
 			await ctx.reply("Please enter the role ID, or leave it blank to look through everyone x3")
@@ -20,6 +21,7 @@ class FunCommands(BaseCog):
 			await ctx.reply(f"I choose: {target.mention}")
 	
 	@commands.command(name="say", brief="Sends a message in a channel", description="Sends [text] in [channel].")
+	@commands.has_permissions(manage_messages=True)
 	async def message_channel(self, ctx: commands.Context, channel: discord.TextChannel, *, text):
 		perms: discord.Permissions = ctx.guild.get_member(ctx.me.id).permissions_in(channel)
 		
@@ -30,6 +32,7 @@ class FunCommands(BaseCog):
 		await channel.send(text)
 		
 	@commands.command(name="whisper", brief="Sends a private message to a user", description="Sends [text] tp [user] in a direct message.")
+	@commands.has_permissions(manage_messages=True)
 	async def dm_user(self, ctx: commands.Context, user: discord.Member, *, text):
 		try:
 			await user.send(text)

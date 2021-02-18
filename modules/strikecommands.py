@@ -6,13 +6,17 @@ import discord
 
 
 class StrikeCommands(BaseCog):
-	@commands.command(name="strike")
+	@commands.command(name="strike", brief="Adds a strike for a user", description="Adds a strike for a user. Reason must be in quotation marks.")
 	@commands.has_permissions(manage_messages=True)
 	async def add_strike(self, ctx: commands.Context, user: discord.User, severity: str, reason: str):
 		sev_score = StrikeConsts.get_severity(severity)
 		
 		if sev_score == StrikeConsts.INVALID_SEVERITY:
 			await ctx.reply("That's not a valid severity!")
+			return
+		
+		if len(reason) > StrikeConsts.STRIKE_REASON_CHAR_LIMIT:
+			await ctx.reply(f"The reason must be under 200 characters, your reason is {len(reason)} characters!")
 			return
 		
 		strikes = self.bot.database.add_strike(user, ctx.message.author, reason, sev_score)
@@ -25,7 +29,7 @@ class StrikeCommands(BaseCog):
 		else:
 			await ctx.reply(f"Strike added for {user.mention}, they now have {strikes} strikes!")
 	
-	@commands.command(name='forgive')
+	@commands.command(name='forgive', brief='Removes a strike for a user', description='Removes strike strike_number for the user.')
 	@commands.has_permissions(manage_messages=True)
 	async def remove_strike(self, ctx: commands.Context, user: discord.User, strike_number: int):
 		new_strikes = self.bot.database.remove_strike(user, strike_number)
@@ -39,7 +43,7 @@ class StrikeCommands(BaseCog):
 		else:
 			await ctx.reply(f"{user.mention} now has {new_strikes} strike{'s' if new_strikes != 1 else ''} x3")
 	
-	@commands.command(name='view', brief='Displays strike data for user', description="Displays the strike data for a user")
+	@commands.command(name='view', brief='Displays strike data for user', description='Displays the strike data for a user')
 	@commands.has_permissions(manage_messages=True)
 	async def view_user(self, ctx: commands.Context, user: discord.User):
 		user_stats = self.bot.database.get_user_stats(user)
@@ -69,7 +73,7 @@ class StrikeCommands(BaseCog):
 		
 		await ctx.channel.send(embed=panel)
 	
-	@commands.command(name='wipe')
+	@commands.command(name='wipe', brief='Removes a user from the strike database.', description='Removes a user from the strike database.')
 	@commands.has_permissions(administrator=True)
 	async def clear_user(self, ctx: commands.context, user: discord.User):
 		result = self.bot.database.remove_user(user)

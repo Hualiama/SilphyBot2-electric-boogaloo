@@ -42,6 +42,7 @@ class SilphyBot(commands.Bot):
 		self.database_name = ""
 		self.database_user = ""
 		self.database: Database = Database("", "", "")
+		self.gate_lock = False
 	
 	async def on_ready(self):
 		slog.log("Ready!")
@@ -56,7 +57,11 @@ class SilphyBot(commands.Bot):
 		
 		if msg.channel.id == self.gate_channel_id:
 			# Process gate message
-			await events.gate_check(self, msg)
+			if self.gate_lock:
+				slog.warning(f"User {msg.author.display_name} tried to get through the gate, but the gate is locked!")
+			else:
+				await events.gate_check(self, msg)
+				
 			return
 		elif not self.is_admin(msg.author):
 			if msg.channel.id != self.staff_channel_id:
