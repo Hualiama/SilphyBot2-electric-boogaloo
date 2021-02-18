@@ -207,7 +207,18 @@ class Database:
 			return [True]
 			
 		return self.connect_and_execute(data_interaction)[1][0]
+	
+	def get_user_stats(self, user: discord.user) -> dict:
+		if not self.user_has_entry(user):
+			return {}
 		
+		def data_inter(cursor: Cursor):
+			sql = f"SELECT * FROM {StrikeConsts.STRIKE_TABLE} WHERE {StrikeConsts.ID}=%s LIMIT 1;"
+			cursor.execute(sql, (user.id,))
+			return [cursor.fetchone()]
+		
+		return self.connect_and_execute(data_inter)[1][0]
+
 
 # Constants
 class StrikeConsts:
@@ -223,7 +234,7 @@ class StrikeConsts:
 	SEVERITY = 'severity'
 	
 	STAGES = [STRIKE_ONE, STRIKE_TWO, BAN]
-	STRIKE_DATA  = [DATE, REASON, MODERATOR, SEVERITY]
+	STRIKE_DATA = [REASON, DATE, MODERATOR, SEVERITY]
 	
 	ID = 'id'
 	USERNAME = 'username'
@@ -279,3 +290,14 @@ class StrikeConsts:
 			return 3
 		else:
 			return -1
+		
+	@staticmethod
+	def get_severity_str(severity: int):
+		if severity == 1:
+			return "Low"
+		elif severity == StrikeConsts.SEVERITY_MEDIUM:
+			return "Moderate"
+		elif severity == StrikeConsts.SEVERITY_HIGH:
+			return "High"
+		else:
+			return "ERROR: " + str(severity)

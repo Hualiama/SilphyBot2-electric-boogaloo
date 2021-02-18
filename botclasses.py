@@ -67,6 +67,9 @@ class SilphyBot(commands.Bot):
 		await self.process_commands(message=msg)
 	
 	async def on_command_error(self, context: commands.Context, exception: commands.CommandError):
+		if issubclass(type(exception), commands.CommandNotFound):
+			return
+		
 		await context.reply("Something went wrong with that command! Make sure you are using it right, or ping Carbon if you are confused x3")
 		traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
 	

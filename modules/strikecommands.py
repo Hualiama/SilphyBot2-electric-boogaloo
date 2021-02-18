@@ -6,7 +6,8 @@ import discord
 
 
 class StrikeCommands(BaseCog):
-	@commands.command(name="addstrike")
+	@commands.command(name="strike")
+	@commands.has_permissions(manage_messages=True)
 	async def add_strike(self, ctx: commands.Context, user: discord.User, severity: str, reason: str):
 		sev_score = StrikeConsts.get_severity(severity)
 		
@@ -17,13 +18,15 @@ class StrikeCommands(BaseCog):
 		strikes = self.bot.database.add_strike(user, ctx.message.author, reason, sev_score)
 		
 		if strikes < 0:
-			await ctx.reply(f"Something went wrong, my records say {user.mention} has {strikes} strikes! Tell Carbon to check the database.")
+			await ctx.reply(
+				f"Something went wrong, my records say {user.mention} has {strikes} strikes! Tell Carbon to check the database.")
 		elif strikes >= 3:
 			await ctx.reply(f"User {user.mention} has {strikes} strikes, they must now be banned >:3c")
 		else:
 			await ctx.reply(f"Strike added for {user.mention}, they now have {strikes} strikes!")
-			
+	
 	@commands.command(name='forgive')
+	@commands.has_permissions(manage_messages=True)
 	async def remove_strike(self, ctx: commands.Context, user: discord.User, strike_number: int):
 		new_strikes = self.bot.database.remove_strike(user, strike_number)
 		
@@ -35,7 +38,37 @@ class StrikeCommands(BaseCog):
 			await ctx.reply("Please enter a position between 1 and 3!")
 		else:
 			await ctx.reply(f"{user.mention} now has {new_strikes} strike{'s' if new_strikes != 1 else ''} x3")
-			
+	
+	@commands.command(name='view', brief='Displays strike data for user', description="Displays the strike data for a user")
+	@commands.has_permissions(manage_messages=True)
+	async def view_user(self, ctx: commands.Context, user: discord.User):
+		user_stats = self.bot.database.get_user_stats(user)
+		
+		if len(user_stats) == 0:
+			await ctx.reply(f"{user.mention} is not in my records uwu")
+			return
+		
+		panel = discord.Embed(title=f"{user.display_name}#{user.discriminator}", color=0xffd70f)
+		panel.set_author(name=f"Entry for {user.display_name}", icon_url=self.bot.user.avatar_url)
+		panel.set_thumbnail(url=user.avatar_url)
+		
+		st = ["Strike One ", "Strike Two ", "Ban "]
+		dt = ["Reason", "Date", "Moderator", "Severity"]
+		
+		for stage, ind in zip(StrikeConsts.STAGES, [0, 1, 2]):
+			for data, jnd in zip(StrikeConsts.STRIKE_DATA, [0, 1, 2, 3]):
+				inline = jnd != 3
+				
+				val = user_stats[stage + data]
+				valstr = str(val) if val is not None else "None"
+				
+				if jnd == 2 and val is not None:
+					valstr = ctx.guild.get_member(val).mention
+					
+				panel.add_field(name=f"{st[ind] if jnd == 0 else ''}{dt[jnd]}", value=valstr, inline=inline)
+		
+		await ctx.channel.send(embed=panel)
+	
 	@commands.command(name='wipe')
 	@commands.has_permissions(administrator=True)
 	async def clear_user(self, ctx: commands.context, user: discord.User):
