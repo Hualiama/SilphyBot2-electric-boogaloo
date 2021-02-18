@@ -1,9 +1,8 @@
-from silphy import SilphyBot
 import slog
 import discord
 
 
-async def gate_check(bot: SilphyBot, message: discord.Message):
+async def gate_check(bot, message: discord.Message):
 	if bot.gate_password == "":
 		return
 	

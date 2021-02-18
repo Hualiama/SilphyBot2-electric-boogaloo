@@ -1,7 +1,7 @@
+from discord.ext import commands
+from core import BaseCog
 import slog
 import sys
-from core import BaseCog
-from discord.ext import commands
 
 
 class AdminCommands(BaseCog):

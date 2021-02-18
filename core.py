@@ -1,5 +1,5 @@
 from discord.ext import commands
-from silphy import SilphyBot
+from botclasses import SilphyBot
 import slog
 
 
