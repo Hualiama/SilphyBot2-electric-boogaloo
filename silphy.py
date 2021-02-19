@@ -3,6 +3,7 @@
 
 # TODO: Strike Member
 # TODO: Random Member
+from modules.gatemod import GateCommands
 from storage import Database
 from discord.ext import commands
 
@@ -35,7 +36,7 @@ if __name__ == "__main__":
 	silphy_bot.load_settings()
 	
 	slog.log("Loading cogs...")
-	cogs = [AdminCommands(silphy_bot), FunCommands(silphy_bot), StrikeCommands(silphy_bot)]
+	cogs = [AdminCommands(silphy_bot), FunCommands(silphy_bot), StrikeCommands(silphy_bot), GateCommands(silphy_bot)]
 	silphy_bot.load_cogs(cogs)
 	
 	slog.log("Starting Client...")

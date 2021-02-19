@@ -1,3 +1,4 @@
+from botclasses import PermissionLevel
 from core import BaseCog
 from discord.ext import commands
 from storage import StrikeConsts
@@ -7,8 +8,10 @@ import discord
 
 class StrikeCommands(BaseCog):
 	@commands.command(name="strike", brief="Adds a strike for a user", description="Adds a strike for a user. Reason must be in quotation marks.")
-	@commands.has_permissions(manage_messages=True)
 	async def add_strike(self, ctx: commands.Context, user: discord.User, severity: str, reason: str):
+		if not self.bot.permission_gate(ctx.author, PermissionLevel.TRIAL_MOD):
+			return
+		
 		sev_score = StrikeConsts.get_severity(severity)
 		
 		if sev_score == StrikeConsts.INVALID_SEVERITY:
@@ -30,8 +33,10 @@ class StrikeCommands(BaseCog):
 			await ctx.reply(f"Strike added for {user.mention}, they now have {strikes} strikes!")
 	
 	@commands.command(name='forgive', brief='Removes a strike for a user', description='Removes strike strike_number for the user.')
-	@commands.has_permissions(manage_messages=True)
 	async def remove_strike(self, ctx: commands.Context, user: discord.User, strike_number: int):
+		if not self.bot.permission_gate(ctx.author, PermissionLevel.MODERATOR):
+			return
+		
 		new_strikes = self.bot.database.remove_strike(user, strike_number)
 		
 		if new_strikes == -1:
@@ -44,8 +49,10 @@ class StrikeCommands(BaseCog):
 			await ctx.reply(f"{user.mention} now has {new_strikes} strike{'s' if new_strikes != 1 else ''} x3")
 	
 	@commands.command(name='view', brief='Displays strike data for user', description='Displays the strike data for a user')
-	@commands.has_permissions(manage_messages=True)
 	async def view_user(self, ctx: commands.Context, user: discord.User):
+		if not self.bot.permission_gate(ctx.author, PermissionLevel.TRIAL_MOD):
+			return
+		
 		user_stats = self.bot.database.get_user_stats(user)
 		
 		if len(user_stats) == 0:
@@ -74,8 +81,10 @@ class StrikeCommands(BaseCog):
 		await ctx.channel.send(embed=panel)
 	
 	@commands.command(name='wipe', brief='Removes a user from the strike database.', description='Removes a user from the strike database.')
-	@commands.has_permissions(administrator=True)
 	async def clear_user(self, ctx: commands.context, user: discord.User):
+		if not self.bot.permission_gate(ctx.author, PermissionLevel.ADMIN):
+			return
+		
 		result = self.bot.database.remove_user(user)
 		
 		if result:

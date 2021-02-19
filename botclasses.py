@@ -11,12 +11,24 @@ import sys
 import os
 
 
+class PermissionLevel:
+	SILENCED = -1
+	UNTRUSTED = 0
+	MEMBER = 1
+	TRUSTED = 2
+	TRIAL_MOD = 3
+	MODERATOR = 4
+	ADMIN = 5
+	SERVER_OWNER = 6
+	BOT_OWNER = 100
+	
+
 class SilphyBot(commands.Bot):
 	SETTINGS_FILE = "settings.json"
 	TOKEN_KEY = "token"
 	SERVER_KEY = "server"
 	GATE_CHANNEL_KEY = "gate_channel"
-	STAFF_CHANNEL_KEY = "staff_channel"
+	STAFF_CHANNEL_KEY = "staff_channels"
 	GATE_PASSWORD_KEY = "passphrase"
 	ADMIN_LIST_KEY = "admins"
 	STAFF_ROLE_KEY = "mod_role"
@@ -31,7 +43,7 @@ class SilphyBot(commands.Bot):
 	def __init__(self, **options):
 		super().__init__("!", **options)
 		self.settings = None
-		self.staff_channel_id = 0
+		self.staff_channel_ids = []
 		self.gate_channel_id = 0
 		self.staff_role_id = 0
 		self.staff_training_role_id = 0
@@ -63,8 +75,8 @@ class SilphyBot(commands.Bot):
 				await events.gate_check(self, msg)
 				
 			return
-		elif not self.is_admin(msg.author):
-			if msg.channel.id != self.staff_channel_id:
+		elif not self.permission_gate(msg.author, PermissionLevel.ADMIN):
+			if msg.channel.id not in self.staff_channel_ids:
 				# If the message is not sent by an admin, and is in the wrong channel, ignore it for now.
 				# TODO: Profanity filter
 				return
@@ -83,7 +95,7 @@ class SilphyBot(commands.Bot):
 			SilphyBot.TOKEN_KEY: "PUT TOKEN HERE",
 			SilphyBot.SERVER_KEY: 0,
 			SilphyBot.GATE_CHANNEL_KEY: 0,
-			SilphyBot.STAFF_CHANNEL_KEY: 0,
+			SilphyBot.STAFF_CHANNEL_KEY: [],
 			SilphyBot.GATE_PASSWORD_KEY: "toy pianos",
 			SilphyBot.ADMIN_LIST_KEY: [],
 			SilphyBot.STAFF_ROLE_KEY: 0,
@@ -120,7 +132,7 @@ class SilphyBot(commands.Bot):
 			with open(SilphyBot.SETTINGS_FILE) as sf:
 				self.settings = json.load(sf)
 			
-			self.staff_channel_id = self.settings[SilphyBot.STAFF_CHANNEL_KEY]
+			self.staff_channel_ids = self.settings[SilphyBot.STAFF_CHANNEL_KEY]
 			self.gate_channel_id = self.settings[SilphyBot.GATE_CHANNEL_KEY]
 			self.staff_role_id = self.settings[SilphyBot.STAFF_ROLE_KEY]
 			self.staff_training_role_id = self.settings[SilphyBot.TRAINER_MOD_ROLE_KEY]
@@ -138,9 +150,33 @@ class SilphyBot(commands.Bot):
 		
 		slog.log("Settings loaded.")
 	
-	def is_admin(self, user: discord.User):
-		return user.id in self.settings[SilphyBot.ADMIN_LIST_KEY]
-	
 	def load_cogs(self, cogs):
 		for cog in cogs:
 			self.add_cog(cog)
+
+	def get_perm_level(self, user: discord.Member) -> int:
+		role_ids = set([x.id for x in user.roles])
+		
+		if self.is_owner(user):
+			return PermissionLevel.BOT_OWNER
+		elif user.guild.owner_id == user.id:
+			return PermissionLevel.SERVER_OWNER
+		elif user.id in self.admin_list:
+			return PermissionLevel.ADMIN
+		elif self.staff_role_id in role_ids:
+			return PermissionLevel.MODERATOR
+		elif self.staff_training_role_id in role_ids:
+			return PermissionLevel.TRIAL_MOD
+		elif self.member_role_id in role_ids:
+			return PermissionLevel.MEMBER
+		else:
+			return PermissionLevel.UNTRUSTED
+		
+	def permission_gate(self, user: discord.Member, level: int) -> bool:
+		"""Determines if user meets the specified permission level.
+		
+		:param user: The user to test
+		:param level: The minimum PermissionLevel the user must
+		:returns: True if the user meets or exceeds level, False otherwise
+		"""
+		return self.get_perm_level(user) >= level
