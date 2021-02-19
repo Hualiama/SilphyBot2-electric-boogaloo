@@ -98,3 +98,10 @@ class AdminCommands(BaseCog):
 			slog.warning(f"Snapshot saved at {filename}")
 			
 		await ctx.channel.send("Snapshot saved o3o")
+
+	@commands.command(name="permlvl", brief="Shows the permission level of a user")
+	async def perm_level(self, ctx: commands.Context, user: discord.Member):
+		if not self.bot.permission_gate(ctx.author, PermissionLevel.TRIAL_MOD):
+			return
+		
+		await ctx.reply(f"{user.mention} has permission level {self.bot.get_perm_level(user)}!")
