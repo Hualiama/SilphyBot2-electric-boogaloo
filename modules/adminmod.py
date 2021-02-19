@@ -10,7 +10,7 @@ import json
 
 
 class AdminCommands(BaseCog):
-	@commands.command(name="shutdown", brief="Shuts down the bot", description="Shuts down the bot")
+	@commands.command(name="shutdown", brief="[A] Shuts down the bot", description="Shuts down the bot")
 	async def shutdown(self, ctx: commands.Context):
 		if self.bot.permission_gate(ctx.author, PermissionLevel.ADMIN):
 			await ctx.reply("Shutting down... 💤")
@@ -19,7 +19,7 @@ class AdminCommands(BaseCog):
 		else:
 			slog.warning(f"User {ctx.author.display_name} tried to shut me down! Not today Jose!")
 
-	@commands.command(name="fixroles", brief="gives spectral pirates to anyone with a role")
+	@commands.command(name="fixroles", brief="[A] Gives spectral pirates to anyone with a role")
 	async def fix_roles(self, ctx: commands.Context):
 		if not self.bot.permission_gate(ctx.author, PermissionLevel.ADMIN):
 			return
@@ -48,7 +48,7 @@ class AdminCommands(BaseCog):
 		slog.info("Done fixing roles!")
 		await ctx.channel.send("Done! x3")
 	
-	@commands.command(name="admin", brief="Grants a user admin perms with Silphy")
+	@commands.command(name="admin", brief="[A] Grants a user admin perms with Silphy")
 	async def add_admin(self, ctx: commands.Context, user: discord.User):
 		if not self.bot.permission_gate(ctx.author, PermissionLevel.ADMIN):
 			return
@@ -59,7 +59,7 @@ class AdminCommands(BaseCog):
 		
 		await ctx.reply(f"{user.mention} is now an Admin!")
 	
-	@commands.command(name="snapshot")
+	@commands.command(name="snapshot", brief="[A] Takes a snapshot of the server")
 	async def take_snapshot(self, ctx: commands.Context):
 		if not self.bot.permission_gate(ctx.author, PermissionLevel.ADMIN):
 			return
@@ -99,7 +99,7 @@ class AdminCommands(BaseCog):
 			
 		await ctx.channel.send("Snapshot saved o3o")
 
-	@commands.command(name="permlvl", brief="Shows the permission level of a user")
+	@commands.command(name="permlvl", brief="[MT] Shows the permission level of a user")
 	async def perm_level(self, ctx: commands.Context, user: discord.Member):
 		if not self.bot.permission_gate(ctx.author, PermissionLevel.TRIAL_MOD):
 			return

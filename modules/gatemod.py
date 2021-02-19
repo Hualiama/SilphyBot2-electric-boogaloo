@@ -6,7 +6,7 @@ import slog
 
 
 class GateCommands(BaseCog):
-	@commands.command(name="gatelock", brief="Prevent users from passing the gate",
+	@commands.command(name="gatelock", brief="[A] Prevent users from passing the gate",
 	                  description="Toggles the lock on the gate, allowing one to turn off the auto-role feature.")
 	async def gate_lock(self, ctx: commands.Context, state: str):
 		if not self.bot.permission_gate(ctx.author, PermissionLevel.ADMIN):
@@ -22,14 +22,14 @@ class GateCommands(BaseCog):
 		
 		await ctx.reply(f"Oki, I {'locked' if self.bot.gate_lock else 'unlocked'} the gate o3o")
 			
-	@commands.command(name="getcode", brief="Gets the current gate password")
+	@commands.command(name="getcode", brief="[MT] Gets the current gate password")
 	async def get_gate_code(self, ctx: commands.Context):
 		if not self.bot.permission_gate(ctx.author, PermissionLevel.TRIAL_MOD):
 			return
 		
 		await ctx.reply(f"Gate password is: {self.bot.gate_password}")
 		
-	@commands.command(name="setcode", brief="Sets the gate password", description="Sets the gate password to code. Password must be in quotes.")
+	@commands.command(name="setcode", brief="[M] Sets the gate password", description="Sets the gate password to code. Password must be in quotes.")
 	async def set_gate_code(self, ctx: commands.Context, code: str):
 		if not self.bot.permission_gate(ctx.author, PermissionLevel.MODERATOR):
 			return
