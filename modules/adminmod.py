@@ -43,7 +43,7 @@ class AdminCommands(BaseCog):
 		granted = 0
 		
 		for user in to_role:
-			member: discord.Member = ctx.guild.get_user(user)
+			member: discord.Member = ctx.guild.get_member(user)
 			await member.add_roles(mem_role)
 			slog.info(f"Fixing roles for {member.display_name}... {granted}/{len(to_role)} ({round(granted/len(to_role) * 100, 2)}%)")
 			
