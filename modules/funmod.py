@@ -38,3 +38,8 @@ class FunCommands(BaseCog):
 			await user.send(text)
 		except discord.HTTPException:
 			await ctx.reply("I can't DM that user! They either blocked me, or have direct messages turned off!")
+
+	@commands.command(name="ping")
+	@commands.has_permissions(manage_messages=True)
+	async def ping(self, ctx: commands.Context):
+		await ctx.reply("Pong!")
