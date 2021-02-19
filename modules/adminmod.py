@@ -32,7 +32,7 @@ class AdminCommands(BaseCog):
 		for user in ctx.guild.members:
 			# Note: This is >1 not >0 because @everyone is always in the role list.
 			if len(user.roles) > 1 and mem_role not in user.roles:
-				to_role.append(user)
+				to_role.append(user.id)
 				
 		if len(to_role) == 0:
 			await ctx.channel.send("There's nobody to give the role to!")
@@ -43,7 +43,9 @@ class AdminCommands(BaseCog):
 		granted = 0
 		
 		for user in to_role:
-			slog.info(f"Fixing roles for {user.display_name}... {granted}/{len(to_role)} ({round(granted/len(to_role) * 100, 2)}%)")
+			member: discord.Member = ctx.guild.get_user(user)
+			await member.add_roles(mem_role)
+			slog.info(f"Fixing roles for {member.display_name}... {granted}/{len(to_role)} ({round(granted/len(to_role) * 100, 2)}%)")
 			
 		slog.info("Done fixing roles!")
 		await ctx.channel.send("Done! x3")
