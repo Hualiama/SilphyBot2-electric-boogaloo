@@ -171,6 +171,23 @@ class SilphyBot(commands.Bot):
 			return PermissionLevel.MEMBER
 		else:
 			return PermissionLevel.UNTRUSTED
+	
+	def get_perm_level_name(self, user: discord.Member) -> str:
+		lvl = self.get_perm_level(user)
+		
+		lvls = {
+			PermissionLevel.SILENCED: "Silenced",
+			PermissionLevel.UNTRUSTED: "Untrusted",
+			PermissionLevel.MEMBER: "Member",
+			PermissionLevel.TRUSTED: "Trusted",
+			PermissionLevel.TRIAL_MOD: "Mod in Training",
+			PermissionLevel.MODERATOR: "Moderator",
+			PermissionLevel.ADMIN: "Admin",
+			PermissionLevel.SERVER_OWNER: "Server Owner",
+			PermissionLevel.BOT_OWNER: "Bot Owner"
+		}
+		
+		return lvls[lvl]
 		
 	def permission_gate(self, user: discord.Member, level: int) -> bool:
 		"""Determines if user meets the specified permission level.
