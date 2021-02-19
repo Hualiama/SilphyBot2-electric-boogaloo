@@ -16,8 +16,6 @@ class AdminCommands(BaseCog):
 			await ctx.reply("Shutting down... 💤")
 			await self.bot.logout()
 			slog.log("Logging out! Goodnight...")
-			sys.exit(0)
-			
 		else:
 			slog.warning(f"User {ctx.author.display_name} tried to shut me down! Not today Jose!")
 			
