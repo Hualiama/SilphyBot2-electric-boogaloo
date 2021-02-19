@@ -104,4 +104,4 @@ class AdminCommands(BaseCog):
 		if not self.bot.permission_gate(ctx.author, PermissionLevel.TRIAL_MOD):
 			return
 		
-		await ctx.reply(f"{user.mention} has permission level {self.bot.get_perm_level(user)}!")
+		await ctx.reply(f"{user.display_name} has permission level {self.bot.get_perm_level(user)}!")

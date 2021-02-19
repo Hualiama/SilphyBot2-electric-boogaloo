@@ -157,7 +157,7 @@ class SilphyBot(commands.Bot):
 	def get_perm_level(self, user: discord.Member) -> int:
 		role_ids = set([x.id for x in user.roles])
 		
-		if self.is_owner(user):
+		if self.owner_id == user.id:
 			return PermissionLevel.BOT_OWNER
 		elif user.guild.owner_id == user.id:
 			return PermissionLevel.SERVER_OWNER
