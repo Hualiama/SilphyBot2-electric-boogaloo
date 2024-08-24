@@ -7,6 +7,7 @@ This is a discord bot made for the community of SharaXOfficial.
 - Utility features
 
 ## Fun Facts
-- Data is stored in a PostgreSQL database
-- The bot is hosted on a Raspberry Pi instead of a personal computer
-  - This is great because it uses much less power, and does not require me to keep my computer on 24/7
+- Data is stored in a psycopg2 database
+- The bot is hosted on a Server now instead of a Carbon's Raspberry pi
+  - This is great because it uses much less power, and does not require me to keep my computer on 24/7, is what Carbon wrote, and is still kinda true, but I draw 200w with my servers
+- This is a fork of Carbon's and is updated with ChatGPT
