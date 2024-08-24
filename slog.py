@@ -1,21 +1,16 @@
 # Logger
-# By Carbon
+# By Carbon and updated by Hualiama
 
-def info(text):
-	print("[i]", text)
-	
+import logging
 
-def log(text):
-	print("[*]", text)
-	
+def log(message):
+    logging.info(message)
 
-def warning(text):
-	print("[*]", text)
-	
+def warning(message):
+    logging.warning(message)
 
-def error(text):
-	print("[!]", text)
-	
-	
-def critical(text):
-	print("[!!!]", text)
+def error(message):
+    logging.error(message)
+    
+def info(message):
+    logging.info(message)
